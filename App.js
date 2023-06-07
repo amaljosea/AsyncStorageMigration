@@ -37,7 +37,7 @@ function App() {
             alignItems: 'center',
           }}>
           {state.todo.map(i => (
-            <Text key={i.id}>{i.label}</Text>
+            <Text key={i.id}>{JSON.stringify(i)}</Text>
           ))}
         </View>
         <Button

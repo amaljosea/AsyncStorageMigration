@@ -1,7 +1,8 @@
 import {migration0} from './migrations/migration0';
 import {migration1} from './migrations/migration1';
+import {migration2} from './migrations/migration2';
 
-const migrations = [migration0, migration1];
+const migrations = [migration0, migration1, migration2];
 
 export const migrate = ({savedLocalState}) => {
   let data = savedLocalState || {};
