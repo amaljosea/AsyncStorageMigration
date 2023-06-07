@@ -36,9 +36,7 @@ function App() {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          {state.todo.map(i => (
-            <Text key={i.id}>{JSON.stringify(i)}</Text>
-          ))}
+          <Text>{JSON.stringify(state)}</Text>
         </View>
         <Button
           title="Add todo"
