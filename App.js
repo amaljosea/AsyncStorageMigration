@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   Button,
   SafeAreaView,
@@ -9,10 +9,9 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {migrate} from './migrate';
+import usePersistedState from './usePersistedState';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -21,21 +20,7 @@ function App() {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const [state, setState] = useState({todo: []});
-
-  useEffect(() => {
-    const sync = async () => {
-      const savedLocalStateString = await AsyncStorage.getItem('local-state');
-      const savedLocalState = JSON.parse(savedLocalStateString || '[]');
-
-      const migratedState = migrate({savedLocalState});
-      console.log('migratedState', migratedState);
-
-      await AsyncStorage.setItem('local-state', JSON.stringify(migratedState));
-      setState(migratedState);
-    };
-    sync();
-  }, []);
+  const {state, setState} = usePersistedState();
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -66,7 +51,6 @@ function App() {
               ],
             };
             setState(newState);
-            await AsyncStorage.setItem('local-state', JSON.stringify(newState));
           }}
         />
       </ScrollView>
