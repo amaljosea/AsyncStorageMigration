@@ -6,7 +6,7 @@
  * @format
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Button,
   SafeAreaView,
@@ -16,6 +16,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
@@ -27,6 +28,17 @@ function App(): JSX.Element {
   };
 
   const [todo, setTodo] = useState<string[]>([]);
+
+  useEffect(() => {
+    const sync = async () => {
+      const savedLocalStateString = await AsyncStorage.getItem('local-state');
+      const savedLocalState = JSON.parse(
+        savedLocalStateString || '[]',
+      ) as string[];
+      setTodo(savedLocalState);
+    };
+    sync();
+  }, []);
 
   return (
     <SafeAreaView style={backgroundStyle}>
@@ -48,8 +60,10 @@ function App(): JSX.Element {
         </View>
         <Button
           title="Add todo"
-          onPress={() => {
-            setTodo([...todo, 'test']);
+          onPress={async () => {
+            const newState = [...todo, 'test'];
+            setTodo(newState);
+            await AsyncStorage.setItem('local-state', JSON.stringify(newState));
           }}
         />
       </ScrollView>
