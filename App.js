@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import usePersistedState from './usePersistedState';
+import usePersistedState from './state/usePersistedState';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
