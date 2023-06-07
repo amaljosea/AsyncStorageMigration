@@ -1,11 +1,4 @@
 /* eslint-disable react-native/no-inline-styles */
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, {useEffect, useState} from 'react';
 import {
   Button,
@@ -19,23 +12,27 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {migrate} from './migrate';
 
-function App(): JSX.Element {
+function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  const [todo, setTodo] = useState<string[]>([]);
+  const [state, setState] = useState({todo: []});
 
   useEffect(() => {
     const sync = async () => {
       const savedLocalStateString = await AsyncStorage.getItem('local-state');
-      const savedLocalState = JSON.parse(
-        savedLocalStateString || '[]',
-      ) as string[];
-      setTodo(savedLocalState);
+      const savedLocalState = JSON.parse(savedLocalStateString || '[]');
+
+      const migratedState = migrate({savedLocalState});
+      console.log('migratedState', migratedState);
+
+      await AsyncStorage.setItem('local-state', JSON.stringify(migratedState));
+      setState(migratedState);
     };
     sync();
   }, []);
@@ -54,15 +51,21 @@ function App(): JSX.Element {
             justifyContent: 'center',
             alignItems: 'center',
           }}>
-          {todo.map(i => (
-            <Text key={i}>{i}</Text>
+          {state.todo.map(i => (
+            <Text key={i.id}>{i.label}</Text>
           ))}
         </View>
         <Button
           title="Add todo"
           onPress={async () => {
-            const newState = [...todo, 'test'];
-            setTodo(newState);
+            const newState = {
+              ...state,
+              todo: [
+                ...state.todo,
+                {id: state.todo.length + 1 + '', label: 'test'},
+              ],
+            };
+            setState(newState);
             await AsyncStorage.setItem('local-state', JSON.stringify(newState));
           }}
         />
